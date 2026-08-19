@@ -26,6 +26,7 @@ from packit_service.events import (
     abstract,
     anitya,
     copr,
+    forgejo,
     github,
     gitlab,
     koji,
@@ -44,6 +45,12 @@ logger = logging.getLogger(__name__)
 UncheckedEvent = Union[
     anitya.NewHotness,
     copr.CoprBuild,
+    forgejo.push.Commit,
+    forgejo.pr.Action,
+    forgejo.pr.Comment,
+    forgejo.issue.Comment,
+    forgejo.action_run.Push,
+    forgejo.action_run.PullRequest,
     github.check.Rerun,
     github.installation.Installation,
     koji.result.Task,
@@ -499,6 +506,14 @@ class Allowlist:
             Callable,
         ] = {
             (  # events that are not checked against allowlist
+                # [XXX] dist-git Forgejo events are unchecked
+                # upstream Forgejo events would require authorization checking
+                forgejo.push.Commit,
+                forgejo.pr.Action,
+                forgejo.pr.Comment,
+                forgejo.issue.Comment,
+                forgejo.action_run.Push,
+                forgejo.action_run.PullRequest,
                 pagure.push.Commit,
                 pagure.pr.Action,
                 pagure.pr.Comment,

@@ -638,6 +638,12 @@ def koji_build_completed_epel8():
 
 
 @pytest.fixture()
+def koji_build_completed_side_tag():
+    with open(DATA_DIR / "fedmsg" / "koji_build_completed_side_tag.json") as outfile:
+        return load_the_message_from_file(outfile)
+
+
+@pytest.fixture()
 def koji_build_tagged():
     with open(DATA_DIR / "fedmsg" / "koji_build_tagged.json") as outfile:
         return load_the_message_from_file(outfile)

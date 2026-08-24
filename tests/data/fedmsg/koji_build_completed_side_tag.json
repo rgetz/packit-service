@@ -1,0 +1,37 @@
+{
+  "body": {
+    "completion_time": "2026-08-24T11:32:40.708855+00:00",
+    "creation_time": "2026-08-24T11:25:26.620844+00:00",
+    "attribute": "state",
+    "build_id": 3085540,
+    "epoch": null,
+    "instance": "primary",
+    "name": "forgejo",
+    "new": 1,
+    "old": 0,
+    "owner": "eln-buildsync",
+    "release": "1.eln159,draft_3085540",
+    "request": [
+      "git+https://src.fedoraproject.org/rpms/forgejo.git#ced1aa24b245770d46e72e14d18b323aba3dbf3f",
+      {
+        "base_tag": "eln-build",
+        "initial_build_ids": [3085529, 3085527],
+        "name": "eln-build-side-148578",
+        "_tagging_tasks_index": {}
+      },
+      {
+        "draft": true,
+        "fail_fast": true,
+        "wait_repo": true
+      }
+    ],
+    "task_id": 149422959,
+    "version": "15.0.7"
+  },
+  "headers": {
+    "sent-at": "2026-08-24T11:32:41+00:00"
+  },
+  "id": "38894c21-e65c-403e-a7e6-acfaf285f73c",
+  "queue": null,
+  "topic": "org.fedoraproject.prod.buildsys.build.state.change"
+}

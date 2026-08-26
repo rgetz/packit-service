@@ -208,10 +208,13 @@ class CoprOpenScanHubHelper(OpenScanHubHelper):
         """
         Find the job in the config that can provide the base build for the scan
         (with `commit` trigger and same branch configured as the target PR branch).
+        Prefer a base build with the same identifier as the configured job,
+        falling back to the first matching base build.
         """
         base_build_job = None
         target_branch = self.copr_build_helper.pull_request_object.target_branch
         default_branch = self.copr_build_helper.project.default_branch
+        configured_identifier = self.copr_build_helper.job_config.identifier
 
         for job in self.copr_build_helper.package_config.get_job_views():
             if (
@@ -222,8 +225,11 @@ class CoprOpenScanHubHelper(OpenScanHubHelper):
                     or (not job.branch and default_branch == target_branch)
                 )
             ):
-                base_build_job = job
-                break
+                if configured_identifier and job.identifier == configured_identifier:
+                    return job
+
+                if base_build_job is None:
+                    base_build_job = job
 
         return base_build_job
 

@@ -182,6 +182,120 @@ def test_handle_scan(build_models):
     ).handle_scan()
 
 
+def test_find_base_build_job_prefers_matching_identifier():
+    qt6_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="main",
+        identifier="qt6",
+    )
+    qt5_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="main",
+        identifier="qt5",
+    )
+
+    package_config = flexmock(
+        get_job_views=lambda: [qt6_job, qt5_job],
+    )
+
+    pull_request = flexmock(target_branch="main")
+    project = flexmock(default_branch="main")
+
+    copr_build_helper = flexmock(
+        package_config=package_config,
+        pull_request_object=pull_request,
+        project=project,
+        job_config=flexmock(identifier="qt5"),
+    )
+
+    helper = CoprOpenScanHubHelper(
+        build=flexmock(),
+        copr_build_helper=copr_build_helper,
+    )
+
+    assert helper.find_base_build_job() is qt5_job
+
+
+def test_find_base_build_job_falls_back_to_first_matching_job():
+    qt6_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="main",
+        identifier="qt6",
+    )
+    qt5_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="main",
+        identifier="qt5",
+    )
+
+    package_config = flexmock(
+        get_job_views=lambda: [qt6_job, qt5_job],
+    )
+
+    pull_request = flexmock(target_branch="main")
+    project = flexmock(default_branch="main")
+
+    copr_build_helper = flexmock(
+        package_config=package_config,
+        pull_request_object=pull_request,
+        project=project,
+        job_config=flexmock(identifier="qt4"),
+    )
+
+    helper = CoprOpenScanHubHelper(
+        build=flexmock(),
+        copr_build_helper=copr_build_helper,
+    )
+
+    assert helper.find_base_build_job() is qt6_job
+
+
+def test_find_base_build_job_ignores_non_matching_jobs():
+    wrong_type_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.pull_request,
+        branch="main",
+        identifier="qt6",
+    )
+    wrong_branch_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="develop",
+        identifier="qt5",
+    )
+    matching_job = flexmock(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        branch="main",
+        identifier="qt4",
+    )
+
+    package_config = flexmock(
+        get_job_views=lambda: [wrong_type_job, wrong_branch_job, matching_job],
+    )
+
+    pull_request = flexmock(target_branch="main")
+    project = flexmock(default_branch="main")
+
+    copr_build_helper = flexmock(
+        package_config=package_config,
+        pull_request_object=pull_request,
+        project=project,
+        job_config=flexmock(identifier=""),
+    )
+
+    helper = CoprOpenScanHubHelper(
+        build=flexmock(),
+        copr_build_helper=copr_build_helper,
+    )
+
+    assert helper.find_base_build_job() is matching_job
+
+
 @pytest.mark.parametrize(
     "job_config_type,job_config_trigger,job_config_targets,scan_status,num_of_handlers",
     [

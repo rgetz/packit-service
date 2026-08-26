@@ -311,6 +311,34 @@ def test_parse_koji_build_event_completed_rawhide(
     assert event_object.packages_config
 
 
+def test_parse_koji_build_event_completed_side_tag(
+    koji_build_completed_side_tag,
+    mock_config,
+):
+    event_object = Parser.parse_event(koji_build_completed_side_tag)
+
+    assert isinstance(event_object, events.result.Build)
+    assert event_object.build_id == 3085540
+    assert event_object.state == KojiBuildState.complete
+    assert event_object.old_state == KojiBuildState.building
+    assert event_object.task_id == 149422959
+    assert event_object.owner == "eln-buildsync"
+    assert event_object.package_name == "forgejo"
+    assert event_object.commit_sha == "ced1aa24b245770d46e72e14d18b323aba3dbf3f"
+    assert event_object.branch_name == "eln"
+    assert event_object.git_ref == "eln"
+    assert event_object.epoch is None
+    assert event_object.version == "15.0.7"
+    assert event_object.release == "1.eln159,draft_3085540"
+    assert event_object.nvr == "forgejo-15.0.7-1.eln159,draft_3085540"
+    assert event_object.project_url == "https://src.fedoraproject.org/rpms/forgejo"
+    assert event_object.start_time is not None
+    assert event_object.completion_time is not None
+
+    assert isinstance(event_object.project, PagureProject)
+    assert event_object.project.full_repo_name == "rpms/forgejo"
+
+
 def test_parse_koji_build_event_completed_f36(koji_build_completed_f36, mock_config):
     event_object = Parser.parse_event(koji_build_completed_f36)
 

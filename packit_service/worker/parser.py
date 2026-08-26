@@ -1516,10 +1516,35 @@ class Parser:
         #       "rawhide",
         #       {}
         #     ],
+        #
+        # or:
+        #
+        # "request": [
+        #     "git+https://src.fedoraproject.org/rpms/forgejo.git#ced1aa24b245770d46e72e14d18b323aba3dbf3f",
+        #     {
+        #         "_tagging_tasks_index": {},
+        #         "base_tag": "eln-build",
+        #         "initial_build_ids": [
+        #             3085529,
+        #             3085527
+        #         ],
+        #         "name": "eln-build-side-148578"
+        #     },
+        #     {
+        #         "draft": true,
+        #         "fail_fast": true,
+        #         "wait_repo": true
+        #     }
+        # ],
+
         raw_git_ref, fedora_target, _ = event.get("request")
         project_url = raw_git_ref.split("#")[0].removeprefix("git+").removesuffix(".git")
         package_name, commit_hash = raw_git_ref.split("/")[-1].split(".git#")
-        branch_name = fedora_target.removesuffix("-candidate")
+
+        if isinstance(fedora_target, dict):
+            fedora_target = fedora_target.get("base_tag")
+
+        branch_name = fedora_target.removesuffix("-candidate").removesuffix("-build")
 
         rpm_build_task_ids = {}
         for children in nested_get(event, "task", "children", default=[]):
@@ -1533,7 +1558,7 @@ class Parser:
             package_name=package_name,
             branch_name=branch_name,
             commit_sha=commit_hash,
-            namespace="rmps",
+            namespace="rpms",
             repo_name=package_name,
             project_url=project_url,
             epoch=epoch,

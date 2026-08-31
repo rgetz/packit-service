@@ -59,6 +59,7 @@
           - python3-specfile
           - packit
         state: latest
+    - import_tasks: tasks/verify-copr-install.yaml
     - name: Install OpenScanHub client from Copr
       ansible.builtin.dnf:
         name: osh-client

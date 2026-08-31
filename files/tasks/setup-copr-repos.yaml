@@ -24,3 +24,12 @@
   community.general.copr:
     name: packit/{{ copr_repo_disabled }}
     state: disabled
+
+# Make sure dnf fails hard instead of silently falling back to the official
+# Fedora repos when the {{ copr_repo_enabled }} copr repo is unreachable
+- name: Fail the build if {{ copr_repo_enabled }} copr repo is unreachable
+  community.general.ini_file:
+    path: /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:packit:{{ copr_repo_enabled }}.repo
+    section: copr:copr.fedorainfracloud.org:packit:{{ copr_repo_enabled }}
+    option: skip_if_unavailable
+    value: "False"

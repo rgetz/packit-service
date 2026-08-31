@@ -49,4 +49,3 @@
           - python3-specfile
           - packit
         state: latest
-    - import_tasks: tasks/verify-copr-install.yaml
